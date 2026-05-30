@@ -1,8 +1,12 @@
+using System.Collections.Generic;
+using System.Data;
 using Godot;
 
 public partial class NetworkManager : Node
 {
 	private ENetMultiplayerPeer peer = new ENetMultiplayerPeer();
+
+	private Dictionary<int, string> playerNames = new Dictionary<int, string>();
 
 	public void HostGame()
 	{
@@ -35,7 +39,7 @@ public partial class NetworkManager : Node
 
 		if (!Multiplayer.IsServer())
 			return;
-
+			
 		//spawn new player for the connected peers
 		if(Rpc(nameof(SpawnRemotePlayer), (int)id) == Error.Ok)
 		{
@@ -55,6 +59,7 @@ public partial class NetworkManager : Node
 			RpcId((int)id, nameof(SpawnRemotePlayer), peerId);
 		}
 	}
+
 
 	// This method will be called on all clients to spawn a new player for the connected peer
 	[Rpc]

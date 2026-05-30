@@ -1,4 +1,5 @@
 using Godot;
+using GodotPlugins.Game;
 using System;
 
 public partial class PlayerClickToMove : CharacterBody2D
@@ -16,16 +17,20 @@ public partial class PlayerClickToMove : CharacterBody2D
 	private Vector2 _targetPosition;
 	private bool _isMoving = false;
 
+	public string playerName = MainMenu.GetPlayerName();
+
 	public override void _Ready()
 	{
 		// Initialize target at current position so we don't move immediately
 		_targetPosition = GlobalPosition;
+
+		GetNode<Label>("UserName").Text = playerName;
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
 		if (!IsMultiplayerAuthority())
-        	return;
+			return;
 		// Check for left mouse click
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.ButtonIndex == MouseButton.Left && mouseEvent.Pressed)
 		{
@@ -38,7 +43,7 @@ public partial class PlayerClickToMove : CharacterBody2D
 	public override void _PhysicsProcess(double delta)
 	{
 		if (!IsMultiplayerAuthority())
-        	return;
+			return;
 		if (!_isMoving) return;
 
 		// Calculate distance to target
@@ -72,7 +77,13 @@ public partial class PlayerClickToMove : CharacterBody2D
 		}
 
 		MoveAndSlide();
-			SyncRemoteTransform();
+		SyncRemoteTransform();
+	}
+
+	public void SetPlayerName(string name)
+	{
+		playerName = name;
+		GetNode<Label>("UserName").Text = playerName;
 	}
 
 	private void SyncRemoteTransform()
@@ -92,4 +103,5 @@ public partial class PlayerClickToMove : CharacterBody2D
 		sprite.FlipH = flipH;
 		sprite.Rotation = rotation;
 	}
+
 }
