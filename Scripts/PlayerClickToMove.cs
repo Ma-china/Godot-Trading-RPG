@@ -24,6 +24,8 @@ public partial class PlayerClickToMove : CharacterBody2D
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
+		if (!IsMultiplayerAuthority())
+        	return;
 		// Check for left mouse click
 		if (@event is InputEventMouseButton mouseEvent && mouseEvent.ButtonIndex == MouseButton.Left && mouseEvent.Pressed)
 		{
@@ -35,6 +37,8 @@ public partial class PlayerClickToMove : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (!IsMultiplayerAuthority())
+        	return;
 		if (!_isMoving) return;
 
 		// Calculate distance to target
@@ -68,5 +72,24 @@ public partial class PlayerClickToMove : CharacterBody2D
 		}
 
 		MoveAndSlide();
+			SyncRemoteTransform();
+	}
+
+	private void SyncRemoteTransform()
+	{
+		var sprite = GetNode<Sprite2D>("Sprite2D");
+		Rpc(nameof(UpdateRemoteTransform), GlobalPosition, sprite.FlipH, sprite.Rotation);
+	}
+
+	[Rpc]
+	private void UpdateRemoteTransform(Vector2 position, bool flipH, float rotation)
+	{
+		if (IsMultiplayerAuthority())
+			return;
+
+		GlobalPosition = position;
+		var sprite = GetNode<Sprite2D>("Sprite2D");
+		sprite.FlipH = flipH;
+		sprite.Rotation = rotation;
 	}
 }
