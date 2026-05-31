@@ -89,11 +89,29 @@ public partial class PlayerClickToMove : CharacterBody2D
 	private void SyncRemoteTransform()
 	{
 		var sprite = GetNode<Sprite2D>("Sprite2D");
-		Rpc(nameof(UpdateRemoteTransform), GlobalPosition, sprite.FlipH, sprite.Rotation);
+		int myId = (int)Multiplayer.GetUniqueId();
+		RpcId(1, nameof(UpdateServerTransform), myId, GlobalPosition, sprite.FlipH, sprite.Rotation);
 	}
 
 	[Rpc]
-	private void UpdateRemoteTransform(Vector2 position, bool flipH, float rotation)
+	private void UpdateServerTransform(int senderPeerId, Vector2 position, bool flipH, float rotation)
+	{
+		if (!Multiplayer.IsServer())
+			return;
+
+		GlobalPosition = position;
+		var sprite = GetNode<Sprite2D>("Sprite2D");
+		sprite.FlipH = flipH;
+		sprite.Rotation = rotation;
+		// Forward the authoritative transform to other clients via the NetworkManager autoload
+		var nm = GetNodeOrNull<NetworkManager>("/root/NetworkManager");
+		if (nm != null)
+		{
+			nm.BroadcastPlayerTransform(senderPeerId, position, flipH, rotation);
+		}
+	}
+
+	public void ApplyRemoteTransform(Vector2 position, bool flipH, float rotation)
 	{
 		if (IsMultiplayerAuthority())
 			return;

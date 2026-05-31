@@ -13,6 +13,12 @@ public partial class NetworkManager : Node
 		peer.CreateServer(12345);
 		Multiplayer.MultiplayerPeer = peer;
 
+		if (GetTree().ChangeSceneToFile("res://Scenes/Room.tscn") != Error.Ok)
+		{
+			GD.PrintErr("Failed to load room scene.");
+			return;
+		}
+
 		Multiplayer.PeerConnected += OnPeerConnected;
 
 		GD.Print("Server started");
@@ -39,6 +45,8 @@ public partial class NetworkManager : Node
 
 		if (!Multiplayer.IsServer())
 			return;
+		
+		SpawnRemotePlayer((int)id);
 			
 		//spawn new player for the connected peers
 		if(Rpc(nameof(SpawnRemotePlayer), (int)id) == Error.Ok)
@@ -80,5 +88,32 @@ public partial class NetworkManager : Node
 		player.Name = $"Player_{peerId}";
 		player.SetMultiplayerAuthority(peerId);
 		GetTree().CurrentScene.AddChild(player);
+	}
+
+	public void BroadcastPlayerTransform(int playerPeerId, Vector2 position, bool flipH, float rotation)
+	{
+		if (!Multiplayer.IsServer())
+			return;
+
+		foreach (var peerId in Multiplayer.GetPeers())
+		{
+			if (peerId == playerPeerId)
+				continue;
+
+			RpcId((int)peerId, nameof(ClientApplyTransform), playerPeerId, position, flipH, rotation);
+		}
+	}
+
+	[Rpc]
+	private void ClientApplyTransform(int playerPeerId, Vector2 position, bool flipH, float rotation)
+	{
+		if (Multiplayer.IsServer())
+			return;
+
+		var node = GetTree().CurrentScene?.GetNodeOrNull($"Player_{playerPeerId}");
+		if (node is PlayerClickToMove p)
+		{
+			p.ApplyRemoteTransform(position, flipH, rotation);
+		}
 	}
 }
