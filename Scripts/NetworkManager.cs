@@ -6,7 +6,13 @@ public partial class NetworkManager : Node
 {
 	private ENetMultiplayerPeer peer = new ENetMultiplayerPeer();
 
-	private Dictionary<int, string> playerNames = new Dictionary<int, string>();
+	private Godot.Collections.Dictionary<long, string> playerInfo = new Godot.Collections.Dictionary<long, string>();
+	
+	public override void _Ready()
+	{
+		Multiplayer.PeerConnected += OnPeerConnected;
+		Multiplayer.ConnectedToServer += OnConnectOk;
+	}
 
 	public void HostGame()
 	{
@@ -18,8 +24,6 @@ public partial class NetworkManager : Node
 			GD.PrintErr("Failed to load room scene.");
 			return;
 		}
-
-		Multiplayer.PeerConnected += OnPeerConnected;
 
 		GD.Print("Server started");
 	}
@@ -34,8 +38,31 @@ public partial class NetworkManager : Node
 			GD.PrintErr("Failed to load room scene.");
 			return;
 		}
-
 		GD.Print("Connected to server");
+	}
+
+	private void OnConnectOk()
+	{
+		GD.Print("Successfully connected to server");
+
+		// Send player info to the server
+		string playerName = MainMenu.GetPlayerName();
+		RpcId(1, nameof(CreatePlayerOnServer), playerName);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+	private void CreatePlayerOnServer(string playerName)
+	{
+		if (!Multiplayer.IsServer())
+			return;
+
+		long peerId = Multiplayer.GetRemoteSenderId();
+		playerInfo[peerId] = playerName;
+		GD.Print($"Player {playerName} connected with ID {peerId}");
+
+		SpawnPlayer(peerId, playerName);
+
+		Rpc(nameof(SpawnPlayer), peerId, playerName);
 	}
 
 	// This method is called on the server when a new peer connects
@@ -45,40 +72,35 @@ public partial class NetworkManager : Node
 
 		if (!Multiplayer.IsServer())
 			return;
-		
-		SpawnRemotePlayer((int)id);
-			
-		//spawn new player for the connected peers
-		if(Rpc(nameof(SpawnRemotePlayer), (int)id) == Error.Ok)
-		{
-			GD.Print("Player spawn RPC sent successfully");
-		}
-		else
-		{
-			GD.PrintErr("Failed to send player spawn RPC");
-		}
 
-		//spawn the connected peers for the new player
-		foreach (var peerId in Multiplayer.GetPeers())
+		RpcId((int)id, nameof(SpawnOthersForNewPlayer), playerInfo);
+	}
+
+	[Rpc]
+	private void SpawnOthersForNewPlayer(Godot.Collections.Dictionary<long, string> existingPlayers)
+	{
+		foreach (var kvp in existingPlayers)
 		{
-			if (peerId == (int)id)
+			long peerId = kvp.Key;
+			string playerName = kvp.Value;
+			if (peerId == Multiplayer.GetUniqueId())
 				continue;
 
-			RpcId((int)id, nameof(SpawnRemotePlayer), peerId);
+			SpawnPlayer(peerId, playerName);
 		}
 	}
 
 
 	// This method will be called on all clients to spawn a new player for the connected peer
 	[Rpc]
-	private void SpawnRemotePlayer(int peerId)
+	private void SpawnPlayer(long peerId, string playerName)
 	{
-		if (peerId == (int)Multiplayer.GetUniqueId())
+		if (peerId == Multiplayer.GetUniqueId())
 			return;
 
 		if (GetTree().CurrentScene == null)
 		{
-			CallDeferred(nameof(SpawnRemotePlayer), peerId);
+			CallDeferred(nameof(SpawnPlayer), peerId, playerName);
 			return;
 		}
 
@@ -86,34 +108,8 @@ public partial class NetworkManager : Node
 		var player = scene.Instantiate<PlayerClickToMove>();
 
 		player.Name = $"Player_{peerId}";
-		player.SetMultiplayerAuthority(peerId);
+		player.SetMultiplayerAuthority((int)peerId);
+		player.SetPlayerName(playerName);
 		GetTree().CurrentScene.AddChild(player);
-	}
-
-	public void BroadcastPlayerTransform(int playerPeerId, Vector2 position, bool flipH, float rotation)
-	{
-		if (!Multiplayer.IsServer())
-			return;
-
-		foreach (var peerId in Multiplayer.GetPeers())
-		{
-			if (peerId == playerPeerId)
-				continue;
-
-			RpcId((int)peerId, nameof(ClientApplyTransform), playerPeerId, position, flipH, rotation);
-		}
-	}
-
-	[Rpc]
-	private void ClientApplyTransform(int playerPeerId, Vector2 position, bool flipH, float rotation)
-	{
-		if (Multiplayer.IsServer())
-			return;
-
-		var node = GetTree().CurrentScene?.GetNodeOrNull($"Player_{playerPeerId}");
-		if (node is PlayerClickToMove p)
-		{
-			p.ApplyRemoteTransform(position, flipH, rotation);
-		}
 	}
 }
