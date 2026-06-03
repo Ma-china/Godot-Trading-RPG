@@ -12,6 +12,8 @@ public partial class NetworkManager : Node
 	{
 		Multiplayer.PeerConnected += OnPeerConnected;
 		Multiplayer.ConnectedToServer += OnConnectOk;
+		Multiplayer.PeerDisconnected += OnPlayerDisconnected;
+		Multiplayer.ServerDisconnected += OnServerDisconnected;
 	}
 
 	public void HostGame()
@@ -39,6 +41,28 @@ public partial class NetworkManager : Node
 			return;
 		}
 		GD.Print("Connected to server");
+	}
+
+	private void OnServerDisconnected()
+	{
+		GD.Print("Disconnected from server");
+		GetTree().ChangeSceneToFile("res://Scenes/MainMenu.tscn");
+	}
+
+	private void OnPlayerDisconnected(long id)
+	{
+		GD.Print($"Player disconnected: {id}");
+		playerInfo.Remove(id);
+
+		GetTree().CurrentScene.GetNodeOrNull($"Player_{id}")?.QueueFree();
+
+		Rpc(nameof(RemovePlayer), id);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+	private void RemovePlayer(long id)
+	{
+		GetTree().CurrentScene.GetNodeOrNull($"Player_{id}")?.QueueFree();
 	}
 
 	private void OnConnectOk()
