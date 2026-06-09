@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cmsei1ulpnh8f"]
 
 [ext_resource type="Script" uid="uid://d1266im8xqgjm" path="res://Scripts/MainRoom.cs" id="1_5hpqs"]
+[ext_resource type="PackedScene" uid="uid://d0yro7c43kteh" path="res://Scenes/Wall.tscn" id="2_nn86p"]
 
 [node name="Room" type="Node2D" unique_id=1247410813]
 script = ExtResource("1_5hpqs")
@@ -8,3 +9,6 @@ cameraZoom = 0.5
 
 [node name="ServerCamera" type="Camera2D" parent="." unique_id=124741957]
 zoom = Vector2(2, 2)
+
+[node name="Wall" parent="." unique_id=1365084422 instance=ExtResource("2_nn86p")]
+position = Vector2(411, 586)

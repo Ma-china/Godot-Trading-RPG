@@ -19,6 +19,11 @@ config/icon="res://icon.svg"
 
 NetworkManager="*uid://dm4w73wi8fku8"
 
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+
 [dotnet]
 
 project/assembly_name="New Game Project"

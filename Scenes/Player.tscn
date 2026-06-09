@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ddv4hkfostad5"]
 
 [ext_resource type="Script" uid="uid://xvsifjjey442" path="res://Scripts/PlayerClickToMove.cs" id="1_2gv18"]
-[ext_resource type="Texture2D" uid="uid://cvtqrcjgnfhpe" path="res://Sprites/OIP.png" id="2_6cwl5"]
+[ext_resource type="Texture2D" uid="uid://cvtqrcjgnfhpe" path="res://Sprites/Player.png" id="2_6cwl5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gndvh"]
 size = Vector2(72, 74)
@@ -24,4 +24,3 @@ offset_bottom = -36.0
 text = "name"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=169641957]
-current = false
