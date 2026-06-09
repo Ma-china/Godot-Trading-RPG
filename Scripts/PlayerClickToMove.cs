@@ -25,6 +25,11 @@ public partial class PlayerClickToMove : CharacterBody2D
 		_targetPosition = GlobalPosition;
 
 		GetNode<Label>("UserName").Text = playerName;
+
+		if (IsMultiplayerAuthority())
+		{
+			GetNode<Camera2D>("Camera2D").MakeCurrent();
+		}
 	}
 
 	public override void _UnhandledInput(InputEvent @event)

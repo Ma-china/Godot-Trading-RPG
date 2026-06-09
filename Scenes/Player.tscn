@@ -22,3 +22,6 @@ offset_top = -59.0
 offset_right = 22.0
 offset_bottom = -36.0
 text = "name"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=169641957]
+current = false

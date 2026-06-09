@@ -4,3 +4,7 @@
 
 [node name="Room" type="Node2D" unique_id=1247410813]
 script = ExtResource("1_5hpqs")
+cameraZoom = 0.5
+
+[node name="ServerCamera" type="Camera2D" parent="." unique_id=124741957]
+zoom = Vector2(2, 2)
