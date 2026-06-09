@@ -25,6 +25,11 @@ public partial class PlayerClickToMove : CharacterBody2D
 		_targetPosition = GlobalPosition;
 
 		GetNode<Label>("UserName").Text = playerName;
+
+		if (IsMultiplayerAuthority())
+		{
+			GetNode<Camera2D>("Camera2D").MakeCurrent();
+		}
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -89,11 +94,25 @@ public partial class PlayerClickToMove : CharacterBody2D
 	private void SyncRemoteTransform()
 	{
 		var sprite = GetNode<Sprite2D>("Sprite2D");
-		Rpc(nameof(UpdateRemoteTransform), GlobalPosition, sprite.FlipH, sprite.Rotation);
+		RpcId(1, nameof(UpdateServerTransform), GlobalPosition, sprite.FlipH, sprite.Rotation);
 	}
 
 	[Rpc]
-	private void UpdateRemoteTransform(Vector2 position, bool flipH, float rotation)
+	private void UpdateServerTransform(Vector2 position, bool flipH, float rotation)
+	{
+		if (!Multiplayer.IsServer())
+			return;
+
+		GlobalPosition = position;
+		var sprite = GetNode<Sprite2D>("Sprite2D");
+		sprite.FlipH = flipH;
+		sprite.Rotation = rotation;
+		// Forward the authoritative transform to other clients via the NetworkManager autoload
+		Rpc(nameof(ApplyRemoteTransform), position, flipH, rotation);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+	public void ApplyRemoteTransform(Vector2 position, bool flipH, float rotation)
 	{
 		if (IsMultiplayerAuthority())
 			return;
@@ -103,5 +122,4 @@ public partial class PlayerClickToMove : CharacterBody2D
 		sprite.FlipH = flipH;
 		sprite.Rotation = rotation;
 	}
-
 }
