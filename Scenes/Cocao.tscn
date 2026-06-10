@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://yhm5b5kukmsu"]
+
+[ext_resource type="Texture2D" uid="uid://5klemvo723qt" path="res://Sprites/CocaoBean.png" id="1_1lrg7"]
+
+[node name="Cocao" type="Node2D" unique_id=629404930]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1368820896]
+texture = ExtResource("1_1lrg7")

@@ -13,32 +13,32 @@ script = ExtResource("1_cw5cq")
 
 [node name="HostButton" type="Button" parent="." unique_id=100587657]
 layout_mode = 0
-offset_left = 67.0
-offset_top = 43.0
-offset_right = 236.0
-offset_bottom = 152.0
+offset_left = 21.0
+offset_top = 16.0
+offset_right = 162.0
+offset_bottom = 94.0
 text = "Host main server"
 
 [node name="JoinButton" type="Button" parent="." unique_id=2086549510]
 layout_mode = 0
-offset_left = 276.0
-offset_top = 45.0
-offset_right = 452.0
-offset_bottom = 159.0
+offset_left = 185.0
+offset_top = 17.0
+offset_right = 325.0
+offset_bottom = 100.0
 text = "join"
 
 [node name="PlayerName" type="LineEdit" parent="." unique_id=1166224027]
 layout_mode = 0
-offset_left = 74.0
-offset_top = 438.0
-offset_right = 955.0
-offset_bottom = 514.0
+offset_left = 43.0
+offset_top = 215.0
+offset_right = 580.0
+offset_bottom = 274.0
 placeholder_text = "Player name"
 
 [node name="ServerIP" type="LineEdit" parent="." unique_id=920603341]
 layout_mode = 0
-offset_left = 75.0
-offset_top = 297.0
-offset_right = 960.0
-offset_bottom = 380.0
+offset_left = 41.0
+offset_top = 125.0
+offset_right = 576.0
+offset_bottom = 172.0
 placeholder_text = "Server Ip (only for testing)"

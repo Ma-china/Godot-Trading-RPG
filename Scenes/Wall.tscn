@@ -8,7 +8,7 @@ size = Vector2(217, 57)
 [node name="Wall" type="StaticBody2D" unique_id=250369947]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1968778550]
-position = Vector2(15.5, -21.5)
+position = Vector2(16, -21)
 shape = SubResource("RectangleShape2D_8r34y")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=165201860]

@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cdavlq5y656lk"]
+
+[ext_resource type="Texture2D" uid="uid://dw0m1b7cmijx7" path="res://Scripts/Backpack.png" id="1_jbd0o"]
+[ext_resource type="PackedScene" uid="uid://yhm5b5kukmsu" path="res://Scenes/Cocao.tscn" id="2_4v8qb"]
+
+[node name="Inventory" type="Node2D" unique_id=1606454137]
+
+[node name="Node2D" type="Node2D" parent="." unique_id=1216288635]
+position = Vector2(140, 163)
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D" unique_id=253753438]
+texture = ExtResource("1_jbd0o")
+
+[node name="Cocao" parent="." unique_id=629404930 instance=ExtResource("2_4v8qb")]
+position = Vector2(304, 261)
