@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d1266im8xqgjm" path="res://Scripts/MainRoom.cs" id="1_5hpqs"]
 [ext_resource type="PackedScene" uid="uid://d0yro7c43kteh" path="res://Scenes/Wall.tscn" id="2_nn86p"]
+[ext_resource type="Texture2D" uid="uid://vqmxfv3t5pwp" path="res://Sprites/Coins.png" id="3_uj218"]
 
 [node name="Room" type="Node2D" unique_id=1247410813]
 script = ExtResource("1_5hpqs")
@@ -12,3 +13,16 @@ zoom = Vector2(2, 2)
 
 [node name="Wall" parent="." unique_id=1365084422 instance=ExtResource("2_nn86p")]
 position = Vector2(411, 586)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2060888193]
+
+[node name="Sprite2D" type="Sprite2D" parent="CanvasLayer" unique_id=1873154545]
+position = Vector2(611, 28)
+texture = ExtResource("3_uj218")
+
+[node name="MoneyLabel" type="Label" parent="CanvasLayer" unique_id=613923169]
+offset_left = 519.0
+offset_top = 13.0
+offset_right = 587.5
+offset_bottom = 44.0
+text = "$0"
